@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from scrapyd_api import ScrapydAPI
 
 
-scrapyd = ScrapydAPI('http://localhost:6800')
+scrapyd = ScrapydAPI('http://scrapyd:6800')
 
 def is_valid_url(url):
     validate = URLValidator()

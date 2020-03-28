@@ -4,9 +4,6 @@ import scrapy
 import urllib.parse
 import json
 from ..items import HotelItem
-from scrapy_selenium import SeleniumRequest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class TripAdvisorSpider(scrapy.Spider):

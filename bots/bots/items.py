@@ -7,7 +7,7 @@
 
 import scrapy
 from scrape.models import ScrapyModel
-from scrapy_djangoitem import DjangoItem
+#from scrapy_djangoitem import DjangoItem
 
 
 class BotsItem(scrapy.Item):
@@ -19,6 +19,3 @@ class HotelItem(scrapy.Item):
     hotel_name = scrapy.Field()
     comment = scrapy.Field()
     source = scrapy.Field()
-
-class ScrapeResultItem(DjangoItem):
-    django_model = ScrapyModel
