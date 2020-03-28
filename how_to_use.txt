@@ -1,0 +1,18 @@
+開server:
+	(1)python manage.py runserver
+	(2)cd bots --> scrapyd
+
+我的django server有兩個接口
+(1)/scrape POST
+	這個body要給hotel_name="你要的飯店名子"，後端就會去佈署爬蟲開爬，檔案會存在bots目錄下(csv檔)
+	當初我想因為爬的資料可能會比較多，因此我用scrapy寫爬蟲
+	主要的流程為
+		- send POST request to /scrape
+		- 回傳一個task_id(用來檢測爬蟲進度)
+		- scrapyd 佈署 spider爬蟲開始爬
+			-我那時後怕使用者輸入的飯店名稱不是exact，所以我模擬在網站搜尋的方式去爬agoda, tripadvisor的建議選項。
+			目前code只會爬第一個建議選項，之後也可以改掉。
+(2)/scrape GET
+	param : task_id
+	給一個task_id去看爬蟲進度，目前還沒有implement回傳資料給使用者，所以暫且是這樣。
+	
