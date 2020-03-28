@@ -45,44 +45,37 @@ class TripAdvisorSpider(scrapy.Spider):
                         meta={'hotel_name':hotel_name, 'suffix':suffix, 'base_url':base_url})
                     # Now breaking because we only want the first suggested result
                     break
-                    '''
-                    suffix_list = suffix.split('Reviews', maxsplit=1)
-                    # loop through 5 pages
-                    for i in range(0, 5):
-                        suffix_t = suffix_list[0] + "Reviews-or{}".format(i*5) + suffix_list[1]
-                        new_url = base_url + suffix_t
-                        self.log('now sending request to '+new_url)
-                        yield scrapy.Request(new_url, callback=self.parse_tripadvisor_hotel, meta={'hotel_name':hotel_name})
-                    '''
 
         elif 'agoda' in target:
-            base_url = 'https://www.agoda.com'
+            base_url = 'https://hkg.agoda.com'
             data = json.loads(response.body)
             for hotel in data['SuggestionList']:
                 hotel_name = hotel['Name']
                 suffix = hotel['Url']
+                hotel_id = hotel['ObjectID']
 
                 '''
-                Currently I don't have to worry about exact hotel page searches because
-                Agoda seems to include the menu search page even if the exact page is found.
-                The current solution is to loop through the response and find the search page url which contains "search"
+                Currently I'm getting the exact hotel_url and hotel_id from suggested results and 
+                directly sending requests to the agoda comment api
                 '''
-                if 'search' in suffix:
-                    # If the results is a search list
-                    new_url = base_url + suffix
+                if 'search' not in suffix:
+                    hotel_url = base_url + suffix
+                    api_url = 'https://hkg.agoda.com/NewSite/en-gb/Review/HotelReviews'
+                    my_headers = {'accept':'application/json', 'referer':hotel_url, 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
+                        , 'Host':'hkg.agoda.com', 'Origin':'https://hkg.agoda.com', 'content-type':'application/json; charset=UTF-8', 'accept-encoding':'gzip, deflate, br', 'accept-language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7', 'X-Requested-With': 'XMLHttpRequest'}
+                    for pageNumber in range(1, 100):
+                        # This is a bit stupid. I'm bruteforing 100 pages becuase I don't know the max page of reviews
+                        payload = {"hotelId":int(hotel_id),"demographicId":0,"pageNo":pageNumber,"pageSize":40,"sorting":1,"reviewProviderIds":[332,3038,27901,28999,27980],"isReviewPage":'false',"isCrawlablePage":'true',"paginationSize":5,"filters":{"language":[1],"room":[]}}
+                        yield scrapy.Request(url=api_url, method='POST', headers=my_headers, body=json.dumps(payload), callback=self.parse_agoda_hotel_review)
+
+                    '''
                     yield SeleniumRequest(url=new_url, 
                         callback=self.parse_agoda_search_menu,
                         wait_time=10,
                         wait_until=EC.presence_of_element_located((By.CSS_SELECTOR, "ol.hotel-list-container")))
+                    '''
                     # Now breaking means we are only scrapying for the first suggestion
                     break
-                '''
-                else:
-                    # This is the exact hotel url
-                    new_url = base_url + suffix
-                    yield scrapy.Request(new_url, callback=self.parse_agoda_hotel_page, meta={'hotel_name':hotel_name})
-                    break
-                '''
 
 
     def tripadvisor_get_max_page(self, response):
@@ -117,43 +110,25 @@ class TripAdvisorSpider(scrapy.Spider):
         driver = response.request.meta['driver']
         hotel_container = driver.find_element_by_class_name('hotel-list-container')
         hotels = hotel_container.find_elements_by_xpath('.//li[@data-hotelid]/a[contains(@id, "hotel-")]')
-
         api_url = 'https://www.agoda.com/NewSite/en-gb/Review/HotelReviews'
-
         for hotel in hotels:
             hotel_url = hotel.get_attribute('href')
             hotel_url = hotel_url[:hotel_url.find('?')]
             hotel_id = re.search('[0-9]+', hotel.get_attribute('id')).group(0)
             my_headers = {'accept':'application/json', 'referer':hotel_url, 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
-                , 'origin':'https://www.agoda.com', 'content-type':'application/json; charset=UTF-8', 'accept-encoding':'gzip, deflate, br', 'accept-language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7'}
+                , 'Host':'hkg.agoda.com', 'Origin':'https://hkg.agoda.com', 'content-type':'application/json; charset=UTF-8', 'accept-encoding':'gzip, deflate, br', 'accept-language':'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7', 'X-Requested-With': 'XMLHttpRequest'}
             self.log(hotel_url)
             self.log(hotel_id)
-
             for pageNumber in range(1, 100):
                 # This is a bit stupid. I'm bruteforing 100 pages becuase I don't know the max page of reviews
                 payload = {"hotelId":int(hotel_id),"demographicId":0,"pageNo":pageNumber,"pageSize":40,"sorting":1,"reviewProviderIds":[332,3038,27901,28999,27980],"isReviewPage":'false',"isCrawlablePage":'true',"paginationSize":5,"filters":{"language":[1],"room":[]}}
                 yield scrapy.Request(url=api_url, method='POST', headers=my_headers, body=json.dumps(payload), callback=self.parse_agoda_hotel_review)
-
             # Now breaking means that we are only scraping the first search result
             break
 
-    '''
-    def parse_agoda_hotel_page(self, response):
-        hotel_id = response.xpath('//link[@id="propertyApiPreload"]/@href').get()
-        hotel_id = re.search('hotel_id=([0-9]+)', hotel_id).group(1)
-        self.log(hotel_id)
-    '''
 
 
     def parse_agoda_hotel_review(self, response):
-        #hotel_id = re.search('rtag_hotelid\s?=\s?([0-9]+)', response.body.decode('utf-8')).group(1)
-        ''' 
-        driver = response.request.meta['driver']
-        comment_container = driver.find_element_by_id('reviewSectionComments')
-        hotels = comment_container.find_elements_by_xpath('.//p[@class="Review-comment-bodyText"]')
-        for i in hotels:
-            self.log(i.text)
-        '''
         json_resp = json.loads(response.body)
         comments = json_resp['commentList']['comments']
         hotel_name = json_resp['hotelName']

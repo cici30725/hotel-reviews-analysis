@@ -11,9 +11,9 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'myproject.settings'
 import django
 django.setup()
 
-SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = 'F:\專題\三下\myproject\chromedriver.exe'
-SELENIUM_DRIVER_ARGUMENTS = ['-headless']  # 用 Headless Chrome 模式啟動
+#SELENIUM_DRIVER_NAME = 'chrome'
+#SELENIUM_DRIVER_EXECUTABLE_PATH = '/home/cici30725/hotel-reviews-analysis/chromedriver'
+#SELENIUM_DRIVER_ARGUMENTS = ['-headless']  # 用 Headless Chrome 模式啟動
 
 # DJANGO INTEGRATION
 
@@ -74,7 +74,7 @@ SPIDER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
 #    'bots.middlewares.BotsDownloaderMiddleware': 543,
-    'scrapy_selenium.SeleniumMiddleware': 800,
+#   'scrapy_selenium.SeleniumMiddleware': 800,
 }
 
 # Enable or disable extensions
