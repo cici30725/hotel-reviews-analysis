@@ -9,6 +9,7 @@ constantly==15.1.0
 cryptography==2.8
 cssselect==1.1.0
 Django==3.0.4
+django-cors-headers==3.2.1
 hyperlink==17.3.1
 idna==2.9
 importlib-metadata==1.5.2
