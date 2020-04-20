@@ -16,7 +16,6 @@ import numpy as np
 
 
 scrapyd = ScrapydAPI('http://scrapyd:6800')
-#scrapyd = ScrapydAPI('http://127.0.0.1:6800')
 ner = Bert_NER('model/NER3/') 
 sen = Review_Sentiment('model/sentiment/')
 
@@ -47,7 +46,7 @@ def home(request):
         settings = {
             'unique_id': unique_id, # unique ID for each record for DB
             'FEED_FORMAT' : 'csv',
-            'FEED_URI' : "../cache/{}.csv".format(unique_id)
+            'FEED_URI' : "../bots/cache/{}.csv".format(unique_id)
             #'USER_AGENT': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
         }
 
@@ -87,18 +86,18 @@ def home(request):
 
 def Ner(unique_id):
     data =0
-    if not os.path.isfile('cache/'+unique_id+'_to_CoNLL.csv'):
+    if not os.path.isfile('bots/cache/'+unique_id+'_to_CoNLL.csv'):
         print("Does not exist *_to_CoNLL.csv file, creating one")
-        review = pd.read_csv('cache/'+unique_id+'.csv', dtype={'comm': str})
+        review = pd.read_csv('bots/cache/'+unique_id+'.csv', dtype={'comm': str})
         pred = sen.prediction(review)
         df = sen.to_csv(pred,unique_id)
-        ner.data = pd.read_csv('cache/'+unique_id+'_label.csv')
+        ner.data = pd.read_csv('bots/cache/'+unique_id+'_label.csv')
         pred = ner.prediction(unique_id)
         ner.to_CoNLL(pred,unique_id)
         print('complete')
         
   
-    data = pd.read_csv('cache/'+unique_id+'_to_CoNLL.csv')
+    data = pd.read_csv('bots/cache/'+unique_id+'_to_CoNLL.csv')
     hotel_name = data['hotel_name'].to_list()[0]
     print("processing hotel name {}".format(hotel_name))
     data['adj'] = data['adj'].map(lambda x: eval(x))
@@ -107,8 +106,8 @@ def Ner(unique_id):
     Filter = ~all_sentence['sentence'].duplicated() ##UID
     data = list(zip(all_sentence[Filter]['ground_truth'].to_list(),all_sentence[Filter]['sentiment'].tolist(),all_sentence[Filter]['sentence'].tolist()))
     
-    good_keyword_top5 = list(np.load('cache/'+unique_id+"_good_keyword_top5.npy"))
-    bad_keyword_top5 = list(np.load('cache/'+unique_id+"_bad_keyword_top5.npy"))
+    good_keyword_top5 = list(np.load('bots/cache/'+unique_id+"_good_keyword_top5.npy"))
+    bad_keyword_top5 = list(np.load('bots/cache/'+unique_id+"_bad_keyword_top5.npy"))
     context = {
         'good_keyword_top5': good_keyword_top5,
         'bad_keyword_top5': bad_keyword_top5,

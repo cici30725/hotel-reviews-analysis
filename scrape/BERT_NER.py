@@ -138,10 +138,10 @@ class Bert_NER:
     def to_CoNLL(self,pred,hotel_name):
         id2tags = {0:'B-KEY', 1:'B-ADJ', 2:'O'}
         sentence_label = []
-        review = pd.read_csv('cache/'+hotel_name+'ground_truth.csv', dtype={'comm': str})
+        review = pd.read_csv('bots/cache/'+hotel_name+'ground_truth.csv', dtype={'comm': str})
         data = {'keyword':[],'adj':[],'sentiment':[],'sentence':[],'ground_truth':[]}
-        if os.path.isfile('cache/'+hotel_name+'_to_CoNLL.csv'):
-            data = pd.read_csv('cache/'+hotel_name+'_to_CoNLL.csv')
+        if os.path.isfile('bots/cache/'+hotel_name+'_to_CoNLL.csv'):
+            data = pd.read_csv('bots/cache/'+hotel_name+'_to_CoNLL.csv')
             data['adj'] = data['adj'].map(lambda x: eval(x))
             data['sentence'] = data['sentence'].map(lambda x: eval(x))
         else:
@@ -181,7 +181,7 @@ class Bert_NER:
                     data['ground_truth'].append(truth)
 
             data = pd.DataFrame(data, columns = ['keyword','adj','sentiment','sentence','ground_truth'])
-            data.to_csv('cache/'+hotel_name+'_to_CoNLL.csv',index = False)
+            data.to_csv('bots/cache/'+hotel_name+'_to_CoNLL.csv',index = False)
 
 
         keyword_sorted = list(data.keyword.value_counts().index)
@@ -207,7 +207,7 @@ class Bert_NER:
             if len(clean_data)>10:
                 good_keyword_top5.append(i)
         temp = np.array(good_keyword_top5)
-        np.save('cache/'+hotel_name+"_good_keyword_top5.npy", temp)       
+        np.save('bots/cache/'+hotel_name+"_good_keyword_top5.npy", temp)       
 
         bad_keyword_top5 = []
         for i in self.bad_keyword_top5:
@@ -216,6 +216,6 @@ class Bert_NER:
             if len(clean_data)>10:
                 bad_keyword_top5.append(i)
         temp = np.array(bad_keyword_top5)
-        np.save('cache/'+hotel_name+"_bad_keyword_top5.npy", temp)       
+        np.save('bots/cache/'+hotel_name+"_bad_keyword_top5.npy", temp)       
 
 

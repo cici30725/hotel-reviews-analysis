@@ -65,11 +65,11 @@ class Review_Sentiment:
             raw_data['comm'].append(comm)
 
         df = pd.DataFrame(raw_data, columns = ['label','comm'])
-        df.to_csv('cache/'+hotel_name+'_label.csv',index = False)
+        df.to_csv('bots/cache/'+hotel_name+'_label.csv',index = False)
 
         #### for test
         df = pd.DataFrame(self.ground_truth, columns = ['label','comm'])
-        df.to_csv('cache/'+hotel_name+'ground_truth.csv',index = False)
+        df.to_csv('bots/cache/'+hotel_name+'ground_truth.csv',index = False)
 
         return raw_data
 
