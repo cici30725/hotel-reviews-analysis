@@ -92,14 +92,20 @@ class TripAdvisorSpider(scrapy.Spider):
 
     # Parse tripadvisor requests and go to next page
     def parse_tripadvisor_hotel(self, response):
-        comments = response.xpath('//*[@data-reviewid]//q/span/text()').getall()
+        #comments = response.xpath('//*[@data-reviewid]//q/span/text()').getall()
+        hotels = response.xpath('//*[@data-reviewid]')
         hotel_name = response.meta.get('hotel_name')
         item = HotelItem()
         item['source'] = 'trip_advisor'
-        for c in comments:
-            #self.log('yielding' + hotel_name)
+        for hotel in hotels:
+            comment = ' '.join(hotel.xpath('.//q/span/text()').getall())
+            # Getting the rating bubble 
+            rating = int(hotel.xpath('./div/div/span/@class').get()[-2])
+            #self.log(comment)
+            #self.log(rating)
             item['hotel_name'] = hotel_name
-            item['comment'] = c
+            item['comm'] = comment 
+            item['label'] = '1' if rating>=4 else '0'
             yield(item)
 
     # Parse's the search menu of agoda
@@ -132,8 +138,10 @@ class TripAdvisorSpider(scrapy.Spider):
         item = HotelItem()
         item['source'] = 'agoda'
         for c in comments:
-            item['comment'] = c['reviewComments']
+            rating = int(c['rating'])
+            item['comm'] = c['reviewComments']
             item['hotel_name'] = hotel_name
+            item['label'] = '1' if rating >= 7 else '0'
             yield(item)
         
 

@@ -17,5 +17,6 @@ class BotsItem(scrapy.Item):
 
 class HotelItem(scrapy.Item):
     hotel_name = scrapy.Field()
-    comment = scrapy.Field()
+    comm = scrapy.Field()
     source = scrapy.Field()
+    label = scrapy.Field()
