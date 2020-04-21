@@ -8,8 +8,8 @@ sys.path.append(os.path.dirname(os.path.abspath('.')))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myproject.settings'
 
 # This is required only if Django Version > 1.8
-import django
-django.setup()
+#import django
+#django.setup()
 
 #SELENIUM_DRIVER_NAME = 'chrome'
 #SELENIUM_DRIVER_EXECUTABLE_PATH = '/home/cici30725/hotel-reviews-analysis/chromedriver'

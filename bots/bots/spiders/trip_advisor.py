@@ -104,7 +104,7 @@ class TripAdvisorSpider(scrapy.Spider):
             #self.log(comment)
             #self.log(rating)
             item['hotel_name'] = hotel_name
-            item['comm'] = comment 
+            item['comm'] = comment.replace('\n', ' ') 
             item['label'] = '1' if rating>=4 else '0'
             yield(item)
 
@@ -139,7 +139,7 @@ class TripAdvisorSpider(scrapy.Spider):
         item['source'] = 'agoda'
         for c in comments:
             rating = int(c['rating'])
-            item['comm'] = c['reviewComments']
+            item['comm'] = c['reviewComments'].replace('\n',' ')
             item['hotel_name'] = hotel_name
             item['label'] = '1' if rating >= 7 else '0'
             yield(item)

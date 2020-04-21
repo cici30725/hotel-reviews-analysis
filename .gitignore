@@ -1,1 +1,6 @@
 **/__pycache__
+bots/cache
+bots/dbs
+bots/eggs
+bots/logs
+model/

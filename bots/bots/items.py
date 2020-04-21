@@ -6,7 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-from scrape.models import ScrapyModel
+#from scrape.models import ScrapyModel
 #from scrapy_djangoitem import DjangoItem
 
 

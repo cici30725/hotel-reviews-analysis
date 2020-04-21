@@ -46,7 +46,7 @@ def home(request):
         settings = {
             'unique_id': unique_id, # unique ID for each record for DB
             'FEED_FORMAT' : 'csv',
-            'FEED_URI' : "../bots/cache/{}.csv".format(unique_id)
+            'FEED_URI' : "cache/{}.csv".format(unique_id)
             #'USER_AGENT': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
         }
 
@@ -78,7 +78,7 @@ def home(request):
         # If it is not finished we can return active status
         # Possible results are -> pending, running, finished
         status = scrapyd.job_status('default', task_id)
-        if status=='finished':
+        if status=='finished' or os.path.isfile('bots/cache/'+unique_id+'.csv'):
             context = Ner(unique_id)
             return JsonResponse({'status':status, 'context':context})
         else:
@@ -98,8 +98,8 @@ def Ner(unique_id):
         
   
     data = pd.read_csv('bots/cache/'+unique_id+'_to_CoNLL.csv')
-    hotel_name = data['hotel_name'].to_list()[0]
-    print("processing hotel name {}".format(hotel_name))
+    #hotel_name = data['hotel_name'].to_list()[0]
+    #print("processing hotel name {}".format(hotel_name))
     data['adj'] = data['adj'].map(lambda x: eval(x))
     data['sentence'] = data['sentence'].map(lambda x: eval(x))
     all_sentence = data
@@ -111,7 +111,7 @@ def Ner(unique_id):
     context = {
         'good_keyword_top5': good_keyword_top5,
         'bad_keyword_top5': bad_keyword_top5,
-        'hotel_name':hotel_name,
+        #'hotel_name':hotel_name,
         # 'adj_top5':ner.adj_top5,
         'data':data,
     }

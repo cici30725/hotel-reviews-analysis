@@ -54,7 +54,7 @@ class Bert_NER:
                     masks.append(attention_masks)
         self.inputs= np.array(inputs).reshape(len(inputs),self.MAX_LEN)
         self.masks = np.array(masks).reshape(len(inputs),self.MAX_LEN)
-    def prediction(self,hotel_name,batch_size=300):
+    def prediction(self,hotel_name,batch_size=10):
         self.to_ids()
         self.model.cuda()
         self.model.eval()
